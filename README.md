@@ -10,52 +10,81 @@
 
 Chạy lệnh sau để cài đặt plugin VMware cho Vagrant:
 
-```vagrant plugin install vagrant-vmware-desktop ```
+```bash
+vagrant plugin install vagrant-vmware-desktop
+```
 
 ## Bước 2: Triển Khai Kubernetes Cluster
 
- ```vagrant up --provider=vmware_desktop ```
+ ``` bash 
+ vagrant up --provider=vmware_desktop 
+ ```
 
 ## Bước 3: Kết Nối vào Master Node
 
- ```vagrant ssh master ```
+ ```bash 
+ vagrant ssh master
+ ```
 
  ## Bước 4: Khởi Tạo Kubernetes Cluster
 
-```sudo nano /etc/systemd/system/kubelet.service.d/10-kubeadm.conf```
+``` bash 
+sudo nano /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+```
 
 Thêm dòng này vào cuối file : 
 
-```Environment="KUBELET_EXTRA_ARGS=--fail-swap-on=false"```
+```bash 
+Environment="KUBELET_EXTRA_ARGS=--fail-swap-on=false"
+```
 
 run command : 
 
-``` sudo kubeadm init --pod-network-cidr=10.244.0.0/16 ```
+```bash 
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16 
+```
 
  ## Bước 5: Thêm Worker Nodes vào Cluster
 
- Truy Cập vào các workernode 
-```sudo nano /etc/systemd/system/kubelet.service.d/10-kubeadm.conf```
+ Truy Cập vào các worker node : 
+
+``` bash 
+sudo nano /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+```
+
 Thêm dòng này vào cuối file : 
 
-```Environment="KUBELET_EXTRA_ARGS=--fail-swap-on=false"``
+```bash 
+Environment="KUBELET_EXTRA_ARGS=--fail-swap-on=false"
+```
 
 Sử dụng lệnh kubeadm join được hiển thị sau khi khởi tạo cluster ở Bước 4 để thêm worker nodes vào cluster. Chạy các lệnh này trên mỗi worker node:
 
-```sudo kubeadm join <master-ip>:<master-port> --token <token> --discovery-token-ca-cert-hash <hash>```
+```bash 
+sudo kubeadm join <master-ip>:<master-port> --token <token> --discovery-token-ca-cert-hash <hash>
+```
 
 
  ## Bước 6: Kết Nối kubectl Configuration
 
  Trở về Master Node : 
- ```mkdir -p $HOME/.kube```
- ```sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config ```
- ```sudo chown $(id -u):$(id -g) $HOME/.kube/config ```
+ ```bash 
+ mkdir -p $HOME/.kube
+
+ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+
+ sudo chown $(id -u):$(id -g) $HOME/.kube/config
+ ```
 
 ## Bước 7: Cài Đặt CNI (Container Network Interface)
-```kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.4/manifests/tigera-operator.yaml```
-```kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.4/manifests/custom-resources.yaml```
+```bash 
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.4/manifests/tigera-operator.yaml
+
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.4/manifests/custom-resources.yaml
+```
 
 ## Bước 8: Kiểm Tra Cluster Status
 
-```kubectl get nodes```
+```bash 
+kubectl get nodes
+```
